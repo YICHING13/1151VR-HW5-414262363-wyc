@@ -1,0 +1,16 @@
+newmtl Red
+Kd 0.85 0.035 0.045
+Ks 0.4 0.4 0.4
+Ns 80
+newmtl White
+Kd 0.94 0.94 0.92
+Ks 0.3 0.3 0.3
+Ns 80
+newmtl Black
+Kd 0.035 0.035 0.045
+Ks 0.35 0.35 0.35
+Ns 80
+newmtl LightGrey
+Kd 0.72 0.76 0.8
+Ks 0.3 0.3 0.3
+Ns 60
