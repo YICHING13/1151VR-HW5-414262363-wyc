@@ -33,6 +33,11 @@ public class PokeballCapture : MonoBehaviour
     [Header("Capture")]
     public float captureDuration = 0.7f;
 
+    [Header("Sound Effect")]
+    public AudioClip successSound;
+
+    private AudioSource audioSource;
+
     private bool hasThrown = false;
     private bool animatingArm = false;
 
@@ -41,6 +46,23 @@ public class PokeballCapture : MonoBehaviour
 
     // Keep the Pokeball's world size constant
     private Vector3 fixedBallScale;
+
+    void Awake()
+    {
+        // Find or create AudioSource
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        // Do not play audio automatically
+        audioSource.playOnAwake = false;
+
+        // 2D audio so it can be heard clearly
+        audioSource.spatialBlend = 0f;
+    }
 
     void Update()
     {
@@ -73,28 +95,37 @@ public class PokeballCapture : MonoBehaviour
         }
     }
 
+    // Apply the throw pose after Idle animation
     void LateUpdate()
     {
         if (!animatingArm) return;
 
         if (rightArm != null)
         {
-            Vector3 axis = armAxis.sqrMagnitude > 0.001f
+            Vector3 axis =
+                armAxis.sqrMagnitude > 0.001f
                 ? armAxis.normalized
                 : Vector3.forward;
 
             rightArm.localRotation *=
-                Quaternion.AngleAxis(armAngle, axis);
+                Quaternion.AngleAxis(
+                    armAngle,
+                    axis
+                );
         }
 
         if (rightForeArm != null)
         {
-            Vector3 axis = foreArmAxis.sqrMagnitude > 0.001f
+            Vector3 axis =
+                foreArmAxis.sqrMagnitude > 0.001f
                 ? foreArmAxis.normalized
                 : Vector3.forward;
 
             rightForeArm.localRotation *=
-                Quaternion.AngleAxis(elbowAngle, axis);
+                Quaternion.AngleAxis(
+                    elbowAngle,
+                    axis
+                );
         }
     }
 
@@ -119,11 +150,15 @@ public class PokeballCapture : MonoBehaviour
             t = Mathf.SmoothStep(0f, 1f, t);
 
             armAngle = Mathf.Lerp(
-                fromArm, toArm, t
+                fromArm,
+                toArm,
+                t
             );
 
             elbowAngle = Mathf.Lerp(
-                fromElbow, toElbow, t
+                fromElbow,
+                toElbow,
+                t
             );
 
             yield return null;
@@ -155,15 +190,13 @@ public class PokeballCapture : MonoBehaviour
             swingTime
         );
 
-        // 3. Remember the ball's world size
-        // before detaching it from RightHand
+        // 3. Remember the Pokeball's world size
         fixedBallScale = transform.lossyScale;
 
-        // Detach the ball from the hand
+        // Detach from RightHand
         transform.SetParent(null, true);
 
-        // Restore its original world size
-        // No parent means local scale = world scale
+        // Preserve the Pokeball's world size
         transform.localScale = fixedBallScale;
 
         Vector3 startPosition = transform.position;
@@ -185,8 +218,10 @@ public class PokeballCapture : MonoBehaviour
 
         // 5. Throw the Pokeball in an arc
         float elapsed = 0f;
+
         float duration = Mathf.Max(
-            0.1f, throwDuration
+            0.1f,
+            throwDuration
         );
 
         while (elapsed < duration)
@@ -214,7 +249,7 @@ public class PokeballCapture : MonoBehaviour
                 Space.Self
             );
 
-            // Keep the ball the same world size
+            // Keep the Pokeball the same size
             transform.localScale = fixedBallScale;
 
             yield return null;
@@ -223,7 +258,7 @@ public class PokeballCapture : MonoBehaviour
         transform.position = endPosition;
         transform.localScale = fixedBallScale;
 
-        // 6. Capture particles
+        // 6. Capture particle effect
         CreateCaptureEffect(endPosition);
 
         // 7. Shrink Bunny only
@@ -231,8 +266,10 @@ public class PokeballCapture : MonoBehaviour
             bunny.transform.localScale;
 
         elapsed = 0f;
+
         duration = Mathf.Max(
-            0.1f, captureDuration
+            0.1f,
+            captureDuration
         );
 
         while (elapsed < duration)
@@ -250,13 +287,20 @@ public class PokeballCapture : MonoBehaviour
                     t
                 );
 
-            // Pokeball remains unchanged
+            // Pokeball stays the same size
             transform.localScale = fixedBallScale;
 
             yield return null;
         }
 
+        // 8. Bunny disappears
         bunny.SetActive(false);
+
+        // 9. Play success sound
+        if (successSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(successSound);
+        }
 
         Debug.Log("Capture Success!");
     }
@@ -290,11 +334,13 @@ public class PokeballCapture : MonoBehaviour
         );
 
         var main = particles.main;
+
         main.loop = false;
         main.duration = 0.5f;
         main.startLifetime = 0.8f;
         main.startSpeed = 3f;
         main.startSize = 0.12f;
+
         main.startColor =
             new Color(1f, 0.85f, 0.2f);
 
@@ -302,18 +348,24 @@ public class PokeballCapture : MonoBehaviour
             ParticleSystemSimulationSpace.World;
 
         var emission = particles.emission;
+
         emission.rateOverTime = 0f;
 
-        emission.SetBursts(new ParticleSystem.Burst[]
-        {
-            new ParticleSystem.Burst(0f, 40)
-        });
+        emission.SetBursts(
+            new ParticleSystem.Burst[]
+            {
+                new ParticleSystem.Burst(0f, 40)
+            }
+        );
 
         var shape = particles.shape;
+
         shape.shapeType =
             ParticleSystemShapeType.Sphere;
+
         shape.radius = 0.2f;
 
+        // URP-compatible particle material
         Shader shader = Shader.Find(
             "Universal Render Pipeline/Particles/Unlit"
         );

@@ -678,6 +678,7 @@ MonoBehaviour:
   arcHeight: 2.5
   spinSpeed: 360
   captureDuration: 0.7
+  successSound: {fileID: 8300000, guid: 137f7e38fd35249f7b0ab21f2ef7836b, type: 3}
 --- !u!1001 &1620012524
 PrefabInstance:
   m_ObjectHideFlags: 0
