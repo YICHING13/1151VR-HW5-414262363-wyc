@@ -33,8 +33,12 @@ https://youtu.be/uZEqyH_1KEY?si=Ra1PkNKikSau317G
 
 相關操作
 Play：執行 Unity 場景，開始遊戲。
+
 Space：觸發 Stick Man 的投擲動作，使精靈球從右手飛出並沿拋物線飛向 Bunny。
+
 收服效果：精靈球抵達 Bunny 後，Bunny 逐漸縮小消失，同時產生金黃色粒子特效。
+
 重新執行：停止 Play 後再次執行，即可重新觀看完整的投擲與收服動畫。
+
 成功音效：Bunny 被收服並完全消失後，自動播放成功提示音。
 
