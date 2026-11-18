@@ -7,7 +7,7 @@
 https://github.com/YICHING13/1151VR-HW5-414262363-wyc
 
 3.YouTube 影片連結
-https://youtu.be/uZEqyH_1KEY?si=Ra1PkNKikSau317G
+https://youtu.be/CDfobOzOSVY?si=x6TZ7yUmNGHU3EcK
 
 4.製作流程
    
